@@ -73,9 +73,125 @@ where ```fmt``` is ```printf``` format string, and ```var``` will match the firs
 		- ```__msg__("%d", 0)``` will output ```0 : 0```
 		- if ```char *str = "abcd";```, ```__msg__("%s", str)``` will output ```str : abcd```
 
+<!-- ?{?
+
 ### ```enum``` operation ```--```
 
+?}? -->
+
 ### Error code check ```--```
+
+To use this funciton,
+```MAIN_POSIX_ERRNO_CHK``` should be defined before return type of ```main()``` function.
+like:
+
+```c
+MAIN_POSIX_ERRNO_CHK int
+main(...)
+{
+	...
+	return 0;
+	...
+}
+```
+
+And then some literary style can be used.
+
+#### Base check
+
+First of all, **all error code should be assigned to posix ```errno```**.
+
+Use ```__chk__``` after function that may set posix ```errno```, like:
+
+```c
+read(fd, &buf, size) __chk__;
+```
+
+If posix ```errno``` was set in ```read```, means that ```read``` is not successfully executed,
+```__chk__``` after ```read``` will **```abort``` the whole program**.
+
+**```__chk__``` would not do anything if macro ```NDEBUG``` is defined**.
+
+#### Use ```__chk__``` in self define function or thirdparty interface
+
+Because ```errno``` is global, when exception occur in a self define funcion,
+set ```errno``` directly is suggested.
+Or use return value or parameter to set error code to ```errno```:
+
+- If function ```int foo()``` return the error code
+	```c
+	errno = foo() __chk__;
+	```
+- If function ```void foo(int *err)``` set the error code by parameter pointer
+	```c
+	foo(&errno) __chk__;
+	```
+
+#### Check without posix ```errno```
+
+```__ext_chk__(err)``` can be used for checking any checkable variable.
+If the value of ```err``` here is not ```0```, ```__ext_chk__``` will abort the program.
+
+```__ext_chk__``` can be used anywhere ```__chk__``` can be used.
+
+#### Skip error
+
+##### ```__ignore_err__```
+
+```__ignore_err__``` before ```__chk__``` can be used for skipping exception **ALL** befor here:
+
+```c
+write(fd, &buf, size) __ignore_err__ __chk__;
+```
+
+In upper code, ```__chk__``` will be **ALWAYS** ignore.
+
+But if there are some process between ```__ignore_err__``` and ```__chk___```,
+it still works:
+
+```c
+write(fd, &buf, size) __ignore_err__;
+write(fd, ((char*)&buf) + size, size) __chk__;
+```
+
+In upper code, only the 2nd ```write``` will be checked.
+
+##### ```__skip__```
+
+```__skip__``` before ```__chk__``` can be used for skipping a type of exception:
+
+```c
+mkdir("./foo", 0777) __skip__(EEXIST) __chk__;
+```
+In upper code, if ```mkdir``` ```./foo``` failed,
+but it is because the file ```./foo``` has been existed, ```__chk__``` will not abort the program.
+
+One ```__skip__``` can only specify one value of error code,
+but multiple ```__skip__``` can be used before one ```__chk___```:
+
+```c
+mkdir("./foo", 0777) __skip__(EEXIST) __skip__(EACCES) __chk__;
+```
+
+In upper code, error code ```EEXIST``` and ```EACCES``` will be ignore at the same ```__chk__```.
+
+#### Self define error message
+
+```__ext_msg__(msg)``` before ```__chk__``` can be used for output content of ```msg```
+when ```__chk__``` abort.
+
+Multiple ```__ext_msg__``` can be used befor one ```__chk__```,
+but **only the last one will be valid**.
+
+```c
+mkdir("./foo", 0777) __skip__(EEXIST) __skip__(EACCES) __ext_msg__("0777") __ext_msg__("./foo") __chk__;
+```
+
+In upper code, when ```mkdir``` failed, string ```"./foo"``` will be sent to ```stderr```,
+except it was failed by ```EEXIST``` or ```EACCES```. ```__ext_msg__("0777")``` will be ignored.
+
+**Note that ```msg``` must be a C style string.**
+
 ## [_.hh](_.hh)
 ## [ecp.hh](ecp.hh)
 ## [raii.hh](raii.hh)
