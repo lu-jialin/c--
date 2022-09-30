@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 # C```--```
 Minus minutia in C/C++ development
 
