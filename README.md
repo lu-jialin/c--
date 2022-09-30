@@ -58,7 +58,7 @@ And ```p``` is a normal pointer variable which value is current loop element in 
 from ```[0]``` to ```elecntof(arr)```
 (if it was not changed in block).
 
-<font style="color:red">Note that ```arr``` must be a array with at least one element, but not pointer.</font>
+<span style="font-color:red">Note that ```arr``` must be a array with at least one element, but not pointer.</span>
 
 ### Initialization ```--```
 
