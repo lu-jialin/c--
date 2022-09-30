@@ -58,7 +58,7 @@ And ```p``` is a normal pointer variable which value is current loop element in 
 from ```[0]``` to ```elecntof(arr)```
 (if it was not changed in block).
 
-**Note that ```arr``` must be a array with at least one element, but not pointer.**
+<font style="color:red">Note that ```arr``` must be a array with at least one element, but not pointer.</font>
 
 ### Initialization ```--```
 
@@ -99,7 +99,7 @@ And then some literary style can be used.
 
 #### Base check
 
-First of all, **all error code should be assigned to posix ```errno```**.
+First of all, <font style="color:red">all error code should be assigned to posix ```errno```</font>.
 
 Use ```__chk__``` after function that may set posix ```errno```, like:
 
@@ -108,9 +108,9 @@ read(fd, &buf, size) __chk__;
 ```
 
 If posix ```errno``` was set in ```read```, means that ```read``` is not successfully executed,
-```__chk__``` after ```read``` will **```abort``` the whole program**.
+```__chk__``` after ```read``` will <font style="color:red">```abort``` the whole program</font>.
 
-**```__chk__``` would not do anything if macro ```NDEBUG``` is defined**.
+<font style="color:red">```__chk__``` would not do anything if macro ```NDEBUG``` is defined</font>.
 
 #### Use ```__chk__``` in self define function or thirdparty interface
 
@@ -181,7 +181,7 @@ In upper code, error code ```EEXIST``` and ```EACCES``` will be ignore at the sa
 when ```__chk__``` abort.
 
 Multiple ```__ext_msg__``` can be used befor one ```__chk__```,
-but **only the last one will be valid**.
+but <font style="color:red">only the last one will be valid</font>.
 
 ```c
 mkdir("./foo", 0777) __skip__(EEXIST) __skip__(EACCES) __ext_msg__("0777") __ext_msg__("./foo") __chk__;
@@ -190,7 +190,7 @@ mkdir("./foo", 0777) __skip__(EEXIST) __skip__(EACCES) __ext_msg__("0777") __ext
 In upper code, when ```mkdir``` failed, string ```"./foo"``` will be sent to ```stderr```,
 except it was failed by ```EEXIST``` or ```EACCES```. ```__ext_msg__("0777")``` will be ignored.
 
-**Note that ```msg``` must be a C style string.**
+<font style="color:red">Note that ```msg``` must be a C style string.</font>
 
 ## [_.hh](_.hh)
 ## [ecp.hh](ecp.hh)
