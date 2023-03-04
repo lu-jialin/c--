@@ -3,6 +3,8 @@
 
 #include "raii.hh"
 
+#include <utility>
+
 template<typename rsc_t>
 struct _raii_t {
 	rsc_t rsc;
@@ -10,6 +12,8 @@ struct _raii_t {
 	void (*dstr)(rsc_t&);
 	public:
 		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {};
+		_raii_t(rsc_t rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;})
+		: rsc{std::move(rsc)}, pred{pred}, dstr{dstr} {}
 		_raii_t(_raii_t &_raii) = delete; //XXX:which better?
 		_raii_t(_raii_t &&_raii)
 			:
@@ -17,8 +21,8 @@ struct _raii_t {
 				pred{std::move(_raii.pred)},
 				dstr{std::move(_raii.dstr)}
 		{}
-		_raii_t(rsc_t rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : rsc{std::move(rsc)}, pred{pred}, dstr{dstr} {}
 		~_raii_t() { if(pred(rsc)) dstr(rsc); }
+
 		const rsc_t operator*() const {return rsc;}
 
 		bool chk() {return pred(rsc);}
@@ -28,10 +32,13 @@ struct _raii_t {
 template<typename rsc_t>
 struct raii_t : public _raii_t<rsc_t> {
 	public:
-		raii_t(rsc_t &rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : _raii_t<rsc_t>(rsc, pred, dstr) {}
-		raii_t(rsc_t &&rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : _raii_t<rsc_t>(rsc, pred, dstr) {}
+		raii_t(rsc_t &rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;})
+		: _raii_t<rsc_t>(rsc, dstr, pred) {}
+		raii_t(rsc_t &&rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;})
+		: _raii_t<rsc_t>(rsc, dstr, pred) {}
 };
 
+#endif
 
 /* Use case for `raii_t<std::thread>` */
 /*
@@ -50,8 +57,8 @@ struct raii_t<std::thread> : _raii_t<std::thread> {
 			_raii_t<std::thread>
 				(
 					std::thread{args...},
-					[](const std::thread &thread)->bool{return true;},
-					[](std::thread &thread){thread.join();}
+					[](std::thread &thread){thread.join();},
+					[](const std::thread &thread)->bool{return true;}
 				)
 		{}
 };
@@ -86,6 +93,3 @@ main()
 	return 0;
 }
 */
-
-
-#endif
