@@ -1,53 +1,91 @@
 #ifndef __RAII_INCLUDE_UNIQ__
 #define __RAII_INCLUDE_UNIQ__
 
-#include <sys/syscall.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <thread>
+#include "raii.hh"
 
-#include "_.hh"
-
-#include "ecp.hh"
-
-template<typename rtn_t, typename rsc_t>
-class raii_c
-{
-	rtn_t rtn;
+template<typename rsc_t>
+struct _raii_t {
 	rsc_t rsc;
+	bool (*pred)(const rsc_t&);
+	void (*dstr)(rsc_t&);
 	public:
-		raii_c();
-		~raii_c();
+		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {};
+		_raii_t(_raii_t &_raii) = delete; //XXX:which better?
+		_raii_t(_raii_t &&_raii)
+			:
+				rsc{std::move(_raii.rsc)},
+				pred{std::move(_raii.pred)},
+				dstr{std::move(_raii.dstr)}
+		{}
+		_raii_t(rsc_t rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : rsc{std::move(rsc)}, pred{pred}, dstr{dstr} {}
+		~_raii_t() { if(pred(rsc)) dstr(rsc); }
+		const rsc_t operator*() const {return rsc;}
+
+		bool chk() {return pred(rsc);}
 };
 
-//example:
 
-//template<typename rtn_t>
-//class raii_c<rtn_t, std::thread>
-//{
-//	rtn_t rtn;
-//	std::thread thread;
-//	public:
-//		raii_c(rtn_t rtn) : rtn{rtn}
-//		{
-//			this->thread = std::thread{&rtn_t::routine, &this->rtn};
-//		}
-//		~raii_c()
-//		{
-//			if(this->thread.joinable()) {this->thread.join();}
-//		}
-//};
+template<typename rsc_t>
+struct raii_t : public _raii_t<rsc_t> {
+	public:
+		raii_t(rsc_t &rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : _raii_t<rsc_t>(rsc, pred, dstr) {}
+		raii_t(rsc_t &&rsc, bool (*pred)(const rsc_t&), void (*dstr)(rsc_t&)) : _raii_t<rsc_t>(rsc, pred, dstr) {}
+};
 
-//class example_c
-//{
-//	friend raii_c<example_c, std::thread>;
-//	const std::string name = "example_c";
-//	ignore_t routine() {}
-//};
 
-//std::shared_ptr<raii_c<example_c, std::thread>> thread_v[] =
-//	{
-//		std::make_shared<raii_c<example_c, std::thread>>(example_c{});
-//	}
+/* Use case for `raii_t<std::thread>` */
+/*
+#include <iostream>
+#include <string>
+#include <memory>
+#include <thread>
+
+template<>
+struct raii_t<std::thread> : _raii_t<std::thread> {
+	//can not move `_raii_t` here
+	public:
+		template<typename... types_t>
+		raii_t(types_t... args)
+		:
+			_raii_t<std::thread>
+				(
+					std::thread{args...},
+					[](const std::thread &thread)->bool{return true;},
+					[](std::thread &thread){thread.join();}
+				)
+		{}
+};
+
+void
+rtn(char c)
+{
+	std::cout << "rtn:" << c << std::endl;
+}
+
+class example_c {
+	const std::string name = "example_c";
+	public: void rtn() {std::cout << name << std::endl;}
+};
+
+int
+main()
+{
+	raii_t<std::thread> thread[] =
+		{
+			raii_t<std::thread>{&example_c::rtn, example_c{}},
+			raii_t<std::thread>{&rtn, 'R'},
+			raii_t<std::thread>{&rtn, 'T'}
+		}
+	;
+	//std::shared_ptr<raii_t<std::thread>> thread[] =
+	//{
+	//	std::make_shared<raii_t<std::thread>>(&example_c::rtn, example_c{}),
+	//	std::make_shared<raii_t<std::thread>>(&rtn, 'r')
+	//};
+	std::cerr << "";
+	return 0;
+}
+*/
+
 
 #endif
