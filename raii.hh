@@ -11,13 +11,13 @@ struct _raii_t {
 	bool (*pred)(const rsc_t&);
 	void (*dstr)(rsc_t&);
 	public:
-		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {};
 		_raii_t(rsc_t &rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
 			rsc{std::move(rsc)}, pred{pred}, dstr{dstr}
 		{}
 		_raii_t(rsc_t &&rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
 			rsc{std::move(rsc)}, pred{pred}, dstr{dstr}
 		{}
+		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {};
 		_raii_t(_raii_t &_raii) = delete; //XXX:which better?
 		_raii_t(_raii_t &&_raii) :
 			rsc{std::move(_raii.rsc)},
