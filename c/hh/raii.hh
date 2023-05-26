@@ -17,7 +17,7 @@ struct _raii_t {
 		_raii_t(rsc_t &&rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
 			rsc{std::move(rsc)}, pred{pred}, dstr{dstr}
 		{}
-		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {};
+		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {}
 		_raii_t(_raii_t &_raii) = delete; //XXX:which better?
 		_raii_t(_raii_t &&_raii) :
 			rsc{std::move(_raii.rsc)},
@@ -56,8 +56,7 @@ struct raii_t<std::thread> : _raii_t<std::thread> {
 	//can not move `_raii_t` here
 	public:
 		template<typename... types_t>
-		raii_t(types_t... args)
-		:
+		raii_t(types_t... args) :
 			_raii_t<std::thread>
 				(
 					std::thread{args...},
@@ -70,11 +69,15 @@ struct raii_t<std::thread> : _raii_t<std::thread> {
 void
 rtn(char c)
 {
+	//std::cout << ((std::string{"rtn:"} + c) + '\n');
+	//std::cout << std::string{"rtn:"}.append(1, c).append("\n");
 	std::cout << "rtn:" << c << std::endl;
 }
 
 class example_c {
 	const std::string name = "example_c";
+	//public: void rtn() {std::cout << (name + '\n');}
+	//public: void rtn() {std::cout << name.append("\n");}
 	public: void rtn() {std::cout << name << std::endl;}
 };
 

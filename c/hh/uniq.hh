@@ -1,7 +1,7 @@
-#ifndef __UNIQ_INCLUDE_UNIQ__
-#define __UNIQ_INCLUDE_UNIQ__
+#ifndef __UNIQ_CC_INCLUDE_UNIQ__
+#define __UNIQ_CC_INCLUDE_UNIQ__
 
-#include "_.hh"
+#include "uniq.hh"
 
 template<typename type_t> type_t
 &uniq_t()
