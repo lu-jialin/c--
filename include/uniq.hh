@@ -3,8 +3,8 @@
 
 #include "uniq.hh"
 
-template<typename type_t> type_t
-&uniq_t()
+template<typename type_t> type_t &
+uniq_t()
 {
 	static type_t uniq;
 	return uniq;

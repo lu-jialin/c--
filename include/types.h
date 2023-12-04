@@ -8,8 +8,14 @@
 #define int_t    int
 #define float_t  float
 #define double_t double
-#define byte_t char_t
-typedef unsigned char     bit_t  ;
+#define byte_t   char_t
+/*
+NOTE :
+`#define` but not `typedef` is to use `signed`/`unsigned` as qualifier :
+`unsigned int_t` `signed char_t`
+*/
+
+typedef unsigned char bit_t ;
 typedef int      main_t   ;
 typedef void     ignore_t ;
 typedef void     any_t    ;

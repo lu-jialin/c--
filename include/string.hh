@@ -8,7 +8,8 @@
 #define cstr(out) str(out).c_str()
 #define vstr(out) vvstr(str(#out "/").append(str(out)))
 
-inline std::string vvstr(std::string out, std::string del = " ")
+inline std::string
+vvstr(std::string out , std::string del=" ")
 {
 	return out.append(del);
 }
@@ -20,7 +21,7 @@ _str(const type_t raw)
 }
 
 template<> inline std::string
-str(const char_t *const raw)
+str(const char_t * const raw)
 {
 	return std::string{raw};
 }

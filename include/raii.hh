@@ -5,21 +5,20 @@
 
 #include <utility>
 
-template<typename rsc_t>
-struct _raii_t {
+template<typename rsc_t> struct _raii_t {
 	rsc_t rsc; //此处使用右值引用会导致指针丢失
 	bool (*pred)(const rsc_t&);
 	void (*dstr)(rsc_t&);
 	public:
-		_raii_t(rsc_t &rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
-			rsc{std::move(rsc)}, pred{pred}, dstr{dstr}
+		_raii_t(rsc_t & rsc , void (*dstr)(rsc_t&) , bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
+			rsc{std::move(rsc)} , pred{pred} , dstr{dstr}
 		{}
-		_raii_t(rsc_t &&rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
-			rsc{std::move(rsc)}, pred{pred}, dstr{dstr}
+		_raii_t(rsc_t &&rsc , void (*dstr)(rsc_t&) , bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
+			rsc{std::move(rsc)} , pred{pred} , dstr{dstr}
 		{}
-		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)}, pred{_raii.pred}, dstr{_raii.dstr} {}
-		_raii_t(_raii_t &_raii) = delete; //XXX:which better?
-		_raii_t(_raii_t &&_raii) :
+		//_raii_t(_raii_t &_raii) : rsc{std::move(_raii.rsc)} , pred{_raii.pred} , dstr{_raii.dstr} {}
+		_raii_t(_raii_t & _raii) = delete; //XXX:which better?
+		_raii_t(_raii_t && _raii) :
 			rsc{std::move(_raii.rsc)},
 			pred{std::move(_raii.pred)},
 			dstr{std::move(_raii.dstr)}
@@ -34,11 +33,11 @@ struct _raii_t {
 template<typename rsc_t>
 struct raii_t : public _raii_t<rsc_t> {
 	public:
-		raii_t(rsc_t &rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
-			_raii_t<rsc_t>(rsc, dstr, pred)
+		raii_t(rsc_t &rsc , void (*dstr)(rsc_t&) , bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
+			_raii_t<rsc_t>(rsc , dstr , pred)
 		{}
-		raii_t(rsc_t &&rsc, void (*dstr)(rsc_t&), bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
-		_raii_t<rsc_t>(rsc, dstr, pred)
+		raii_t(rsc_t &&rsc , void (*dstr)(rsc_t&) , bool (*pred)(const rsc_t&) = [](const rsc_t&)->bool{return true;}) :
+		_raii_t<rsc_t>(rsc , dstr , pred)
 		{}
 };
 

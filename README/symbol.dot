@@ -1,0 +1,73 @@
+rankdir=LR
+
+root[label="" shape=point]
+
+root -> {
+	_symbol[label="可读性视角下的符号分类"]
+	_token[label="可读性视角下的记号分类"]
+	_line[label="行的展开"]
+	_column[label="列对齐"]
+	_uniformity[label="一致性优先原则"shape=oval]
+	_belong[label="从属不分割原则"shape=oval]
+	_serial[label="连续符号不分割原则"shape=oval]
+	_tokenassymbol[label="符号和记号的功能性聚合"shape=oval]
+}
+
+_line -> {_l_line[label="行一致性"]}
+
+_l_line -> {
+	_l_tail[label="行尾标记"]
+	_l_head[label="行首标记"]
+}
+
+_l_tail -> {_l_t_end[label="垂直方向上的块结束对齐"]}
+_l_head -> {_l_h_child[label="从属一致性"]}
+
+_symbol -> {
+	{_s_adj[label="伴随符号"]}
+	{_s_bnd[label="边界符号"]}
+	{_s_dlm[label="分隔符号"]}
+	{_s_end[label="终止符号"]}
+	subgraph cluster_a {
+		label="传递符号"
+		{_s_clc[label="关系符号"]}
+		{_s_blg[label="从属符号"]}
+	}
+}
+
+_s_adj -> {_s_a_both[label="均分伴随"]} -> {
+	_s_a_both_ref[label="&"]
+	_s_a_both_der[label="*"]
+}
+
+_s_dlm -> _s_end [dir=both style=dotted]
+
+_s_bnd -> {
+	{_s_b_match[label="匹配垂直对齐"]}
+	{_s_b_independent[label="独立垂直对齐"]}
+}
+-> {_s_b__function[label="以功能区分的灵活对齐方式"]}
+-> {_s_b__f_eg[label="e.g."]} -> {
+	_s_b__f_eg_data[label="数据/结构"]
+	_s_b__f_eg_procedure[label="过程"]
+}
+
+{_s_clc _s_blg _s_adj} -> {_s_c_weight[label="权重一致性"]}
+
+_s_blg -> _l_line [style=dotted]
+
+_line -> {_s_dlm _s_bnd}[style=dotted]
+
+_line -> {_l_empty[label="空对齐"]}
+
+_column -> {_c_qualifier[label="可读性视角下的修饰词分类"]}
+
+_c_qualifier -> {
+	static
+	const
+	extern
+	inline
+	"..."
+}
+
+_line -> {_l_qvsid[label="修饰词与标识符"]}
