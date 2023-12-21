@@ -11,7 +11,7 @@ jobs:
         - env:
               GITHUB_CONTEXT: ${{ toJson(github) }}
           run: echo "$GITHUB_CONTEXT"
-        - uses: actions/checkout
+        - uses: actions/checkout@ref
           with:
               ref: ${{ github.ref }}
         - run: ls -l main.m4.c
