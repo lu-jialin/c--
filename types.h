@@ -19,8 +19,11 @@ typedef unsigned char bit_t ;
 typedef int      main_t   ;
 typedef void     ignore_t ;
 typedef void     any_t    ;
-typedef FILE     FILE_t   ;
-typedef bool     bool_t   ;
+
+#if 0 /* Types below need to include other headers */
+typedef FILE    FILE_t    ;
+typedef bool    bool_t    ;
 typedef va_list va_list_t ;
+#endif
 
 #endif
