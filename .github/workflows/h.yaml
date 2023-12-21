@@ -15,5 +15,5 @@ jobs:
           with:
               ref: ${{ github.ref }}
         - run: ls -l main.m4.c
-        - run: sudo apt install -y ninja-build && ninja --version
-        - run: for h in $(find -name '*.h');do; echo $h ;done
+        - run: clang --version
+        - run: for h in $(find -name '*.h');do echo $h ;done
