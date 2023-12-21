@@ -11,9 +11,9 @@ jobs:
         - env:
               GITHUB_CONTEXT: ${{ toJson(github) }}
           run: echo "$GITHUB_CONTEXT"
-        - uses: actions/checkout@main
+        - uses: actions/checkout
           with:
               ref: ${{ github.ref }}
         - run: ls -l main.m4.c
         - run: clang --version
-        - run: for h in $(find -name '*.h');do m4 -D__h__="$h" $(find -name main.m4.c) | clang -x c - ; stat a.out && rm a.out ;done
+        - run: for h in $(find -name '*.h');do m4 -D__h__="$h" $(find -name main.m4.c) | clang -x c - ; stat a.out >/dev/null && rm a.out ;done
