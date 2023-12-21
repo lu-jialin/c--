@@ -1,0 +1,13 @@
+on: push
+permissions:
+    contents: write
+jobs:
+    h:
+        runs-on: ubuntu-latest
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_CONTEXT: ${{ toJson(github) }}
+        steps:
+        - name: Dump GitHub context
+          run: echo "$GITHUB_CONTEXT"
+        - run: ls

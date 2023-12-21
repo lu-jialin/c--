@@ -1,8 +1,8 @@
 #ifndef __LOG_INCLUDE_UNIQ__
 #define __LOG_INCLUDE_UNIQ__
 
-#include <stdio.h>
-#include <errno.h>
+//#include <stdio.h>
+//#include <errno.h>
 
 #include "log.h"
 
