@@ -3,13 +3,17 @@
 
 #include "log.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+
 #define __ext_msg__(msg) ;*__msg_location() = msg;
 #define __ext_chk__(chk) ;if(!(chk)) errno = -1;
 #ifdef NDEBUG
 #define __chk__ ;
 #define __skip__(err) ;
 #else
-#define __chk__ ;if(errno){ fprintf(stderr , "%s:%d:%s:" , __FILE__ , __LINE__ , __func__) ; perror(*__msg_location()) ; exit(-1) ; } else{ *__msg_location() = ""; };
+#define __chk__ ;if(errno){ fprintf(stderr , "%s:%d:%s:" , __FILE__ , __LINE__ , __func__) ; perror(*__msg_location()) ; abort() ; } else{ *__msg_location() = ""; };
 #define __skip__(err) ;errno = (errno == err) ? 0 : errno;
 #endif
 
